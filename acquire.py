@@ -33,6 +33,20 @@ def starwars_data():
         starships = requests.get(starships["next"]).json()
         starships_df = pd.concat([starships_df, pd.DataFrame(starships["results"])]).reset_index(drop=True)
             
+    # tidy the data using explod to fix columns with list inside the cells
+    people_df = people_df.explode(column="films")
+    people_df = people_df.explode(column="species")
+    people_df = people_df.explode(column="vehicles")
+    people_df = people_df.explode(column="starships")
+
+    # ... continues
+    planets_df = planets_df.explode(column="residents")
+    planets_df = planets_df.explode(column="films")
+
+    # ... continues
+    starships_df = starships_df.explode(column="films")
+    starships_df = starships_df.explode(column="pilots")
+
     # merge the three dataframes
     star_plan = pd.merge(left=planets_df, right=planets_df, how="left", on="url")
     starwars = pd.merge(left=star_plan, right=people_df, how="inner", left_on="url", right_on="homeworld")
